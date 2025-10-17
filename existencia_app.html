@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4a148c">
+    <title>Existencia - Control de Operadoras</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 20px;
+            max-width: 100%;
+            width: 100%;
+            max-width: 950px;
+            overflow-x: auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        th, td {
+            border: 2px solid #333;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-size: 13px;
+        }
+        
+        .operadora-cell {
+            background: #9c27b0;
+            color: white;
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        
+        .header-pc {
+            background: #2196f3;
+        }
+        
+        .header-telefono {
+            background: #ff9800;
+        }
+        
+        .header-diferencia {
+            background: #4caf50;
+        }
+        
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-size: 11px;
+            text-align: right;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .calc-field {
+            background: #f5f5f5;
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 8px;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .btn-guardar {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+        }
+        
+        .btn-guardar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        .btn-limpiar {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+        
+        .btn-limpiar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #323232;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            table {
+                font-size: 10px;
+            }
+            
+            input[type="number"], input[type="text"] {
+                font-size: 10px;
+                padding: 6px;
+            }
+            
+            .calc-field {
+                font-size: 10px;
+            }
+            
+            button {
+                padding: 12px 30px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EXISTENCIA</h1>
+        
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="3" class="operadora-cell">Operadora</th>
+                        <th colspan="2" class="header-pc">PC</th>
+                        <th colspan="2" class="header-telefono">Telefono</th>
+                        <th colspan="2" class="header-diferencia">Diferencia</th>
+                    </tr>
+                    <tr>
+                        <th class="header-pc">Recs</th>
+                        <th class="header-pc">Dolares</th>
+                        <th class="header-telefono">Unidades<br>Recs</th>
+                        <th class="header-telefono">Dolares</th>
+                        <th class="header-diferencia">En<br>Dolares</th>
+                        <th class="header-diferencia">Mensaje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="operadora-cell">Tigo</td>
+                        <td><input type="number" id="tigo-recs" step="0.01" placeholder="0.00"></td>
+                        <td><div class="calc-field" id="tigo-dolares-pc">$ 0.00</div></td>
+                        <td><div class="calc-field" id="tigo-unidades">0.00</div></td>
+                        <td><input type="text" id="tigo-dolares-tel" placeholder="$ 0.00"></td>
+                        <td><div class="calc-field" id="tigo-diferencia"></div></td>
+                        <td><div class="calc-field" id="tigo-mensaje"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="operadora-cell">Claro</td>
+                        <td><input type="number" id="claro-recs" step="0.01" placeholder="0.00"></td>
+                        <td><div class="calc-field" id="claro-dolares-pc">$ 0.00</div></td>
+                        <td><div class="calc-field" id="claro-unidades">0.00</div></td>
+                        <td><input type="text" id="claro-dolares-tel" placeholder="$ 0.00"></td>
+                        <td><div class="calc-field" id="claro-diferencia"></div></td>
+                        <td><div class="calc-field" id="claro-mensaje"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="operadora-cell">Movistar</td>
+                        <td><input type="number" id="movistar-recs" step="0.01" placeholder="0.00"></td>
+                        <td><div class="calc-field" id="movistar-dolares-pc">$ 0.00</div></td>
+                        <td><div class="calc-field" id="movistar-unidades">0.00</div></td>
+                        <td><input type="text" id="movistar-dolares-tel" placeholder="$ 0.00"></td>
+                        <td><div class="calc-field" id="movistar-diferencia"></div></td>
+                        <td><div class="calc-field" id="movistar-mensaje"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="operadora-cell">Digicel</td>
+                        <td><input type="number" id="digicel-recs" step="0.01" placeholder="0.00"></td>
+                        <td><div class="calc-field" id="digicel-dolares-pc">$ 0.00</div></td>
+                        <td><div class="calc-field" id="digicel-unidades">0.00</div></td>
+                        <td><input type="text" id="digicel-dolares-tel" placeholder="$ 0.00"></td>
+                        <td><div class="calc-field" id="digicel-diferencia"></div></td>
+                        <td><div class="calc-field" id="digicel-mensaje"></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-guardar" onclick="guardarDatos()">Guardar</button>
+            <button class="btn-limpiar" onclick="limpiarDatos()">Limpiar</button>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const tasas = {
+            tigo: 0.0475,
+            claro: 0.0470,
+            movistar: 0.0476,
+            digicel: 0.0470
+        };
+
+        let datosHistorial = {};
+
+        function cargarDatos() {
+            const datosGuardados = datosHistorial;
+            if (Object.keys(datosGuardados).length > 0) {
+                Object.keys(datosGuardados).forEach(key => {
+                    const elem = document.getElementById(key);
+                    if (elem && elem.tagName === 'INPUT') {
+                        elem.value = datosGuardados[key];
+                    }
+                });
+                calcularTodo();
+            }
+        }
+
+        function formatearDolares(valor) {
+            if (!valor || isNaN(valor)) return '$ 0.00';
+            return '$ ' + parseFloat(valor).toFixed(2);
+        }
+
+        function formatearNumero(valor) {
+            if (!valor || isNaN(valor)) return '0.00';
+            return parseFloat(valor).toFixed(2);
+        }
+
+        function parsearDolares(texto) {
+            if (!texto) return 0;
+            return parseFloat(texto.toString().replace('$', '').replace(/,/g, '').trim()) || 0;
+        }
+
+        function calcularOperadora(operadora) {
+            const recsInput = document.getElementById(`${operadora}-recs`);
+            const dolaresTeInput = document.getElementById(`${operadora}-dolares-tel`);
+            
+            const recs = parseFloat(recsInput.value) || 0;
+            const dolaresTel = parsearDolares(dolaresTeInput.value);
+            
+            const dolaresPc = recs * tasas[operadora];
+            const unidades = dolaresTel / tasas[operadora];
+            
+            document.getElementById(`${operadora}-dolares-pc`).textContent = formatearDolares(dolaresPc);
+            document.getElementById(`${operadora}-unidades`).textContent = formatearNumero(unidades);
+            
+            const diferencia = Math.abs(dolaresPc - dolaresTel);
+            
+            if (diferencia > 0 && diferencia < 0.1) {
+                document.getElementById(`${operadora}-diferencia`).textContent = '';
+                document.getElementById(`${operadora}-mensaje`).textContent = '';
+            } else {
+                const diff = dolaresPc - dolaresTel;
+                document.getElementById(`${operadora}-diferencia`).textContent = formatearDolares(diff);
+                
+                if (diff > 0) {
+                    document.getElementById(`${operadora}-mensaje`).textContent = 'Mas en Pc';
+                } else if (diff < 0) {
+                    document.getElementById(`${operadora}-mensaje`).textContent = 'Mas enTel';
+                } else {
+                    document.getElementById(`${operadora}-mensaje`).textContent = '';
+                }
+            }
+        }
+
+        function calcularTodo() {
+            ['tigo', 'claro', 'movistar', 'digicel'].forEach(calcularOperadora);
+        }
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                const operadora = this.id.split('-')[0];
+                calcularOperadora(operadora);
+            });
+            
+            input.addEventListener('blur', function() {
+                if (this.id.includes('dolares-tel')) {
+                    const valor = parsearDolares(this.value);
+                    this.value = formatearDolares(valor);
+                }
+            });
+        });
+
+        function guardarDatos() {
+            const datos = {};
+            document.querySelectorAll('input').forEach(input => {
+                datos[input.id] = input.value;
+            });
+            
+            datosHistorial = {...datos};
+            
+            mostrarToast('✓ Datos guardados correctamente');
+        }
+
+        function limpiarDatos() {
+            if (confirm('¿Estás seguro de que deseas limpiar todos los datos?')) {
+                document.querySelectorAll('input').forEach(input => {
+                    input.value = '';
+                });
+                calcularTodo();
+                mostrarToast('✓ Datos limpiados');
+            }
+        }
+
+        function mostrarToast(mensaje) {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensaje;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        window.addEventListener('load', cargarDatos);
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZnVuY3Rpb24oZXZlbnQpIHsKICBzZWxmLnNraXBXYWl0aW5nKCk7Cn0pOwoKc2VsZi5hZGRFdmVudExpc3RlbmVyKCdhY3RpdmF0ZScsIGZ1bmN0aW9uKGV2ZW50KSB7CiAgcmV0dXJuIHNlbGYuY2xpZW50cy5jbGFpbSgpOwp9KTs=')
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+    </script>
+</body>
+</html>
